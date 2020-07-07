@@ -1,0 +1,82 @@
+---
+title: "Train, Test & Predict 02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(base.dir = './images')
+```
+
+## Setup
+```{r message=FALSE}
+library(caret)
+library(kernlab)
+set.seed(32323)
+data(spam)
+```
+
+## Subsets
+
+```{r}
+inTrain <- createDataPartition(y = spam$type, p = 0.75, list = FALSE)
+
+training <- spam[inTrain,]
+testing <- spam[-inTrain,]
+dim(training)
+```
+
+## Return Train
+
+```{r}
+
+
+foldsTrain <- createFolds(y = spam$type, k = 10, list = TRUE, returnTrain = TRUE)
+
+sapply(foldsTrain, length)
+```
+
+```{r}
+foldsTrain[[1]][1:10]
+```
+
+## Return Test
+
+```{r}
+foldsTest <- createFolds(y = spam$type, k = 10, list = TRUE, returnTrain = FALSE)
+
+sapply(foldsTest, length)
+```
+
+```{r}
+foldsTest[[1]][1:10]
+```
+
+## Resampling
+
+```{r}
+foldsRes <- createResample(y = spam$type, times = 10, list = TRUE)
+sapply(foldsRes, length)
+```
+
+```{r}
+foldsRes[[1]][1:10]
+```
+
+## Time Slices
+
+```{r}
+time <- 1:1000
+foldsTime <- createTimeSlices(y = time, initialWindow = 20, horizon = 10) # Windows of 20 samples, predict next 10 samples
+names(foldsTime)
+```
+
+```{r}
+foldsTime$train[[1]]
+```
+
+```{r}
+foldsTime$test[[1]]
+```
+
+
