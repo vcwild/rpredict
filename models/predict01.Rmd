@@ -1,0 +1,45 @@
+---
+title: "Train, Test & Predict 01"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(base.dir = './images')
+```
+
+## Setup
+```{r message=FALSE}
+library(caret)
+library(kernlab)
+```
+
+```{r}
+data(spam)
+inTrain <- createDataPartition(y = spam$type, p = 0.75, list = FALSE)
+
+training <- spam[inTrain,]
+testing <- spam[-inTrain,]
+dim(training)
+```
+```{r message=FALSE, warning=FALSE}
+set.seed(32343)
+fit <- train(type ~ ., data = training, method = 'glm')
+```
+
+```{r}
+fit
+```
+
+```{r}
+fit$finalModel
+```
+
+```{r}
+predictions <- predict(fit, newdata = testing)
+summary(predictions)
+```
+```{r}
+confusionMatrix(predictions, testing$type)
+```
+
