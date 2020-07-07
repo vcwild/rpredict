@@ -1,0 +1,71 @@
+---
+title: "Covariate: Add Dummy | Polynomial, Rm Near Zero"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+library(caret)
+library(ISLR)
+data(Wage)
+```
+
+```{r}
+inTrain <- createDataPartition(y = Wage$wage, p = 0.7, list = FALSE)
+training <- Wage[inTrain,]
+testing <- Wage[-inTrain,]
+```
+
+## Common covariates to add dummy variables
+
+Basic idea is to convert factor variables to indicator variables
+
+```{r}
+table(training$jobclass)
+```
+
+```{r}
+dummies <- dummyVars(wage ~ jobclass, data = training)
+head(predict(dummies, newdata = training))
+```
+
+## Removing near zero covariates
+
+Removing less meaningful predictors who should not be used in a prediction model
+
+```{r}
+nsv <- nearZeroVar(training, saveMetrics = TRUE)
+nsv
+```
+
+## Spline Basis
+
+### Creating a polynomial model
+
+```{r}
+library(splines)
+bsBasis <- bs(training$age, df = 3)
+head(bsBasis)
+```
+
+### Fitting model to train set
+
+```{r}
+lm1 <- lm(wage ~ bsBasis, data = training)
+plot(training$age, training$wage, pch = 19, cex = 0.5)
+points(training$age, predict(lm1, newdata = training), col = "red", pch = 19, cex = 0.5)
+```
+
+### Fitting model to test set
+
+```{r}
+aux <- predict(bsBasis, age = testing$age)
+head(aux)
+```
+
+Key search in Google: feature extraction for [data type]
