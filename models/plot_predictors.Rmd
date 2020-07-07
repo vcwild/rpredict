@@ -1,0 +1,76 @@
+---
+title: "Plotting Predictors"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r message=FALSE}
+library(caret)
+library(ISLR)
+library(ggplot2)
+library(Hmisc)
+data(Wage)
+```
+
+## Subset
+
+```{r message=FALSE}
+inTrain <- createDataPartition(y = Wage$wage, p = 0.7, list = FALSE)
+
+training <- Wage[inTrain,]
+testing <- Wage[-inTrain,]
+```
+
+## Feature Plot
+
+```{r}
+featurePlot(
+    x = training[, c("age", "education", "jobclass")], 
+    y = training$wage, 
+    plot = "pairs"
+)
+```
+```{r}
+qplot(age, wage, data = training, colour = education) +
+    geom_smooth(method = 'lm', formula = y ~ x)
+```
+
+## Break Multiple Quantiles
+
+```{r}
+cutWage <- cut2(training$wage, g = 3) # Break into 3 quantile groups
+table(cutWage)
+```
+
+```{r}
+p1 <- qplot(cutWage, age, data = training, fill = cutWage, geom = "boxplot")
+p2 <- qplot(cutWage, age, data = training, fill = cutWage, geom = c("boxplot", "jitter"))
+
+p1
+p2
+
+```
+
+## Table Analysis
+
+```{r}
+t1 <- table(cutWage, training$jobclass)
+
+t1
+```
+
+```{r}
+prop.table(t1, 1)
+```
+
+## Density Plot
+
+```{r}
+qplot(wage, colour = education, data = training, geom = "density")
+```
+
