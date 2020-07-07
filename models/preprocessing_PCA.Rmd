@@ -1,0 +1,106 @@
+---
+title: "Preprocessing with PCA"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+library(caret)
+library(kernlab)
+data(spam)
+```
+
+```{r}
+inTrain <- createDataPartition(y = spam$type, p = 0.75, list = FALSE)
+training <- spam[inTrain,]
+testing <- spam[-inTrain,]
+
+```
+
+## Correlated predictors
+
+```{r}
+M <- abs(cor(training[, -58]))
+diag(M) <- 0
+which(M > 0.8, arr.ind = TRUE)
+```
+
+```{r}
+names(spam)[c(34, 32)]
+```
+```{r}
+plot(spam[,34], spam[,32])
+```
+
+### Rotating the plot
+
+```{r}
+X <- 0.71 * training$num415 + 0.71 * training$num857
+Y <- 0.71 * training$num415 - 0.71 * training$num857
+
+plot(X, Y)
+```
+
+We can use the sum of these 2 variables to make 1 predictor
+
+### SVD
+
+$$ X = UDV^T $$
+
+*U matrix*: left singular vector 
+
+*D matrix*: diagonal vector (singular values)
+
+*V matrix*: right singular vector
+
+### Principal Components
+
+```{r}
+smallSpam <- spam[, c(34, 32)]
+prComp <- prcomp(smallSpam)
+plot(prComp$x[,1], prComp$x[,2])
+```
+
+```{r}
+prComp$rotation
+```
+
+### PCA on dataset
+
+```{r}
+typeColor <- ((spam$type == "spam") * 1 + 1)
+prComp <- prcomp(log10(spam[, -58] + 1))
+
+plot(prComp$x[,1], prComp$x[,2], col = typeColor, xlab = "PC1", ylab = "PC2")
+```
+
+### PCA using CARET
+
+```{r}
+preProc <- preProcess(log10(spam[,-58] + 1), method = "pca", pcaComp = 2)
+spamPC <- predict(preProc, log10(spam[, -58] + 1))
+
+plot(spamPC[,1], spamPC[,2], col = typeColor)
+```
+
+## Preprocessing with PCA - training
+
+```{r message=FALSE, warning=FALSE}
+preProc <- preProcess(log10(spam[,-58] + 1), method = "pca", pcaComp = 2)
+trainPC <- predict(preProc, log10(training[, -58] + 1))
+modelFit <- train(type ~ ., method = "glm", preProcess = "pca", data = training)
+```
+
+## Preprocessing with PCA - testing
+
+```{r}
+confusionMatrix(testing$type, predict(modelFit, testing))
+```
+
+
+

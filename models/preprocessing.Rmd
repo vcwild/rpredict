@@ -1,0 +1,135 @@
+---
+title: "Preprocessing"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+library(caret)
+library(kernlab)
+library(RANN)
+data(spam)
+```
+
+## Split the Data
+
+```{r}
+inTrain <- createDataPartition(y = spam$type, p = 0.75, list = FALSE)
+training <- spam[inTrain,]
+testing <- spam[-inTrain,]
+
+hist(training$capitalAve, main = "", xlab= "Ave. Capital run length")
+```
+
+Spread variables across all length
+
+```{r}
+mean(training$capitalAve)
+```
+
+```{r}
+sd(training$capitalAve)
+```
+
+Very high standard deviation
+
+## Standardizing
+
+```{r}
+trainCapAve <- training$capitalAve
+trainCapAveS <- (trainCapAve - mean(trainCapAve))/sd(trainCapAve)
+mean(trainCapAveS)
+```
+
+### Standardize test set
+
+When standardizing a test set we need to use the train mean and train std
+**We cannot use test mean and test std!**
+
+```{r}
+
+testCapAve <- testing$capitalAve
+testCapAveS <- (testCapAve - mean(trainCapAve)) / sd(trainCapAve)
+mean(testCapAveS)
+```
+
+```{r}
+sd(testCapAveS)
+```
+
+### Standardization using preProcess function
+
+```{r}
+preObj <- preProcess(training[,-58], method = c("center", "scale"))
+trainCapAveS <- predict(preObj, training[, -58])$capitalAve
+mean(trainCapAveS)
+```
+```{r}
+sd(trainCapAveS)
+```
+
+```{r}
+testCapAveS <- predict(preObj, testing[, -58])$capitalAve
+mean(testCapAveS)
+```
+
+```{r}
+sd(testCapAveS)
+```
+
+### Standardizing - preProcess argument
+
+```{r message=FALSE, warning=FALSE}
+set.seed(323243)
+model <- train(type ~ ., data = training, preProcess = c("center", "scale"), method = "glm")
+model
+```
+
+### Standardizing Box-Cox Transforms
+
+```{r}
+preObj <- preProcess(training[, -58], method = c("BoxCox"))
+trainCapAveS <- predict(preObj, training[, -58])$capitalAve
+par(mfrow = c(1, 2))
+hist(trainCapAveS)
+qqnorm(trainCapAveS)
+```
+
+### Standardizing - Imputing data
+
+```{r}
+set.seed(13343)
+
+# Generating NAs to use as example
+training$capAve <- training$capitalAve
+selectNA <- rbinom(dim(training)[1], size = 1, prob = 0.05) == 1
+training$capAve[selectNA] <- NA
+
+# Impute and standardize
+preObj <- preProcess(training[, -58], method = "knnImpute")
+capAve <- predict(preObj, training[, -58])$capAve
+
+# Standardize true values
+capAveTruth <- training$capitalAve
+capAveTruth <- (capAveTruth - mean(capAveTruth)) / sd(capAveTruth)
+```
+
+Comparing imputed to non imputed
+
+```{r}
+quantile(capAve - capAveTruth)
+```
+
+```{r}
+quantile((capAve - capAveTruth)[selectNA])
+```
+
+```{r}
+quantile((capAve - capAveTruth)[!selectNA])
+```
+
