@@ -1,0 +1,61 @@
+---
+title: "Classification Trees"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+data(iris)
+library(ggplot2)
+library(caret)
+```
+
+```{r}
+table(iris$Species)
+```
+
+## Subsets
+
+```{r}
+inTrain <- createDataPartition(iris$Species, p = 0.7, list = FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+
+```
+
+## EDA
+
+```{r}
+ggplot(training, aes(Petal.Width, Sepal.Width, color = Species)) + geom_point()
+```
+
+## Fitting the Model
+
+```{r}
+modFit <- train(Species ~ ., method = "rpart", data = training)
+modFit$finalModel
+```
+
+### Plotting the Classification Tree
+
+```{r}
+plot(modFit$finalModel, uniform = TRUE, main = "Classification Tree")
+text(modFit$finalModel, use.n = TRUE, cex = .8)
+```
+
+```{r}
+# library(rattle)
+# fancyRpartPlot(modFit$finalModel)
+```
+
+# Predicting new values
+
+```{r}
+predict(modFit, newdata = testing)
+```
+
