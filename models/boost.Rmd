@@ -1,0 +1,51 @@
+---
+title: "Boosting"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+library(ggplot2)
+library(caret)
+library(ISLR)
+data(Wage)
+```
+
+## Subsets
+
+```{r}
+Wage <- subset(Wage, select = -c(logwage))
+inTrain <- createDataPartition(Wage$wage, p = 0.7, list = FALSE)
+training <- Wage[inTrain,]
+testing <- Wage[-inTrain,]
+```
+
+## Boosters
+
+gbm - Boosting with trees
+
+mboost - model based
+
+ada - statistical boosting on additive logistic regression
+
+gamBoost - boosting generalized additive models
+
+## Fit the Model
+
+```{r message=FALSE, warning=FALSE}
+modFit <- train(wage ~ ., method = "gbm", data = training, verbose = FALSE)
+modFit
+```
+
+```{r}
+qplot(predict(modFit, testing), wage, data = testing)
+```
+
+
+
+
