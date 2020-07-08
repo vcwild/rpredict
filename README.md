@@ -1,24 +1,35 @@
-Predict
+RPredict
 ================
 
 A quick reference guide to R prediction modeling.
 
-# Topics
+## Topics
 
-[Train, Test & Predict](./models/predict01.md)
+### Pre-Processing
 
-[Resampling & Time Slices](./models/predict02.md)
+- [Train, Test & Predict](./models/predict01.md)
 
-[Plotting Predictors](./models/plot_predictors.md)
+- [Resampling & Time Slices](./models/predict02.md)
 
-[Preprocessing](./models/preprocessing.md)
+- [Plotting Predictors](./models/plot_predictors.md)
 
-[Dummy Variables, Fit Polynomial & Remove Near Zero
-Variance](./models/covariate_creation.md)
+- [Preprocessing](./models/preprocessing.md)
 
-[Preprocessing with Principal Component
-Analysis](./models/preprocessing_PCA.md)
+- [Dummy Variables, Fit Polynomial & Remove Near Zero Variance](./models/covariate_creation.md)
 
-[Predicting with Linear Regression](./models/regression.md)
+- [Preprocessing with Principal Component Analysis](./models/preprocessing_PCA.md)
 
-[Multiple Covariates Linear Regression](./models/multivar_regression.md)
+### Prediction Models
+
+- [Predicting with Linear Regression](./models/regression.md)
+
+- [Multiple Covariates Linear Regression](./models/multivar_regression.md)
+
+- [Classification Tree](./models/classification_tree.md)
+
+- [Boosting](./models/boost.md)
+
+- [Random Forest](./models/random_forest.md)
+
+- [Linear Discrimination & Naive Bayes](./models/model_based.md)
+
