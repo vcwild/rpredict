@@ -1,0 +1,70 @@
+---
+title: "Unsupervised Prediction Simulation"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+To build a predictor:
+
+- Create clusters
+
+- Name the clusters
+
+- Build predictor for the clusters
+
+In a new data set:
+
+- Predict clusters
+
+## Setup
+
+```{r}
+library(caret)
+library(ggplot2)
+data(iris)
+```
+
+## Subsets
+
+
+```{r}
+inTrain <- createDataPartition(iris$Species, p = 0.7, list = FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+```
+
+## Create K-Means Cluster Analysis
+- Ignoring the species labels in iris data
+
+```{r}
+set.seed(566516)
+kMeans1 <- kmeans(subset(training, select = -c(Species)), centers = 3)
+training$clusters <- as.factor(kMeans1$cluster)
+qplot(Petal.Width, Petal.Length, color = clusters, data = training)
+```
+
+## Compare to Real Labels
+
+```{r}
+table(kMeans1$cluster, training$Species)
+```
+
+## Build a Predictor
+
+```{r}
+modFit <- train(clusters ~ ., data = subset(training, select = -c(Species)), method = "rpart") # Classification Tree
+table(predict(modFit, training), training$Species)
+```
+
+## Apply on Test dataset
+
+```{r}
+testClusterPred <- predict(modFit, testing)
+table(testClusterPred, testing$Species)
+```
+
