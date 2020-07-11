@@ -33,3 +33,10 @@ A quick reference guide to R prediction modeling.
 
 - [Linear Discrimination & Naive Bayes](./models/model_based.md)
 
+### Manipulating Models
+
+- [Model Stacking](./models/model_stacking.md)
+
+- [Forecasting](./models/forecast.md)
+
+- [Unsupervised Simulation](./models/unsupervised.md)
