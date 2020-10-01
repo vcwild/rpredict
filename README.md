@@ -1,7 +1,7 @@
 RPredict
 ================
 
-A quick reference guide to R prediction modeling.
+A quick, hands-on reference guide to R predictive modeling.
 
 ## Topics
 
